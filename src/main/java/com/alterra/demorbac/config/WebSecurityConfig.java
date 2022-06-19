@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -41,7 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfiguration {
             .anyRequest().authenticated().and()
             .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        http.addFilterBefore(new JwtAuthenticationFilter(tokenProvider, userService()), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthenticationFilter(tokenProvider, userDetailsService()), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
@@ -75,7 +76,7 @@ public class WebSecurityConfig extends WebSecurityConfiguration {
     }
 
     @Bean
-    public UserService userService() {
+    public UserDetailsService userDetailsService() {
         return new UserService();
     }
     

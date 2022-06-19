@@ -11,12 +11,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.GenericFilterBean;
 
 import com.alterra.demorbac.component.TokenProvider;
 import com.alterra.demorbac.constant.Constant;
 import com.alterra.demorbac.model.User;
-import com.alterra.demorbac.service.UserService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -26,12 +26,12 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     
-    private final UserService userService;
+    private final UserDetailsService userDetailsService;
     private final TokenProvider jwtTokenUtil;
 
-    public JwtAuthenticationFilter(TokenProvider jwtTokenUtil, UserService userService) {
+    public JwtAuthenticationFilter(TokenProvider jwtTokenUtil, UserDetailsService userDetailsService) {
         this.jwtTokenUtil = jwtTokenUtil;
-        this.userService = userService;
+        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -58,7 +58,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         }
 
         if (username != null && authentication == null) {
-            User user = (User) userService.loadUserByUsername(username);
+            User user = (User) userDetailsService.loadUserByUsername(username);
 
             if (jwtTokenUtil.isTokenValid(token, user)) {
                 Authentication authenticationToken = jwtTokenUtil.getAuthenticationToken(token, authentication, user);
