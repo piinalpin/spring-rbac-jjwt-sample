@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -37,7 +38,6 @@ public class WebSecurityConfig extends WebSecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, TokenProvider tokenProvider) throws Exception {
         http.httpBasic().and().cors().and().csrf().disable()
             .authorizeHttpRequests()
-            .antMatchers("/h2-console/**").permitAll()
             .antMatchers("/auth/**").permitAll()
             .anyRequest().authenticated().and()
             .exceptionHandling().authenticationEntryPoint(unauthorizedEntryPoint).and()
@@ -78,6 +78,11 @@ public class WebSecurityConfig extends WebSecurityConfiguration {
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserService();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/h2-console/**");
     }
     
 }
