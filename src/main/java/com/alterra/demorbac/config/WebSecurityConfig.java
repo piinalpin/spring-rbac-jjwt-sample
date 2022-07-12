@@ -1,6 +1,9 @@
 package com.alterra.demorbac.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -67,10 +70,24 @@ public class WebSecurityConfig extends WebSecurityConfiguration {
     @Bean
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
+
+            @Value("#{'${spring.cors.allowed-origins}'.split(',')}")
+            private List<String> allowedOrigins;
+
+            @Value("#{'${spring.cors.allowed-methods}'.split(',')}")
+            private List<String> allowedMethods;
+
+            @Value("#{'${spring.cors.allowed-headers}'.split(',')}")
+            private List<String> allowedHeaders;
+
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedMethods("*");
+                registry
+                    .addMapping("/**")
+                    .allowedOrigins(allowedOrigins.toArray(new String[0]))
+                    .allowedMethods(allowedMethods.toArray(new String[0]))
+                    .allowedHeaders(allowedHeaders.toArray(new String[0]))
+                    .allowCredentials(true);
             }
         };
     }
